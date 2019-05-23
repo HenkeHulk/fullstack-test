@@ -10,7 +10,7 @@ namespace SolidFeeCalculator
         static void Main(string[] args)
         {
             var fee = 0;
-            int usertype = 1, itemtype = 1, itemprice = 100;
+            int usertype = 1, itemtype = 0, itemprice = 100;
             DateTime itemenddate = DateTime.Today;
 
             try
@@ -45,6 +45,14 @@ namespace SolidFeeCalculator
         /// <returns></returns>
         public static int CalculateFee(int usertype, int itemtype, int itemprice,  DateTime itemenddate)
         {
+            //Baseprices and discounts
+            int auctionBaseFee = 25;
+            int buyNowBaseFee = 35;
+            int compDiscount = 5;
+            int enddateTodayDiscount = 10;
+            int compEnddatDiscount = compDiscount + enddateTodayDiscount;
+            decimal normalPercentage = 0.07m;
+            decimal compPercentage = 0.04m;
             try
             {
                 decimal percentage;
@@ -52,42 +60,42 @@ namespace SolidFeeCalculator
                 switch (usertype)
                 {
                     case 0: //Normal
-                         percentage = 0.07m;
+                        percentage = normalPercentage;
                         #region Normal user
-                        int itemfeeN = Decimal.ToInt32(itemprice * percentage);
+                        int itemfeeN = Decimal.ToInt32(itemprice * percentage); //Calculating the variable price for the item
                         if (itemtype == 0) //Auction
                         {
                             var enddateDiscount = 0;
-                            if (itemenddate == DateTime.Today) enddateDiscount = 10;
+                            if (itemenddate == DateTime.Today) enddateDiscount = enddateTodayDiscount;
 
-                            return itemfeeN + 25 - enddateDiscount;
+                            return itemfeeN + auctionBaseFee - enddateDiscount;
                         }
                         else if (itemtype == 1) //BuyItNow
                         {
                             var enddateDiscount = 0;
-                            if (itemenddate == DateTime.Today) enddateDiscount = 10;
+                            if (itemenddate == DateTime.Today) enddateDiscount = enddateTodayDiscount;
 
-                            return itemfeeN + 35 - enddateDiscount;
+                            return itemfeeN + buyNowBaseFee - enddateDiscount;
                         }
                         break; 
 	                    #endregion
                     case 1: //Company
-                        percentage = 0.04m;
+                        percentage = compPercentage;
                         #region Company
-                        int itemfee = Decimal.ToInt32(itemprice * percentage);
+                        int itemfee = Decimal.ToInt32(itemprice * percentage); //Calculating the variable price for the item
                         if (itemtype == 0) //Auction
                         {
                             if (itemenddate == DateTime.Today)
-                                return itemfee + 25 - 15;// Enddate discount and company discount
+                                return itemfee + auctionBaseFee - compEnddatDiscount;// Enddate discount and company discount
 
-                            return itemfee + 25 - 5;// Only company discount
+                            return itemfee + auctionBaseFee - compDiscount;// Only company discount
                         }
                         else if (itemtype == 1) //BuyItNow
                         {
                             if (itemenddate == DateTime.Today)
-                                return itemfee + 35 - 15;// Enddate discount and company discount
+                                return itemfee + buyNowBaseFee - compEnddatDiscount;// Enddate discount and company discount
 
-                            return itemfee + 35 - 5;// Only company discount
+                            return itemfee + buyNowBaseFee - compDiscount;// Only company discount
                         }
                         break; 
                         #endregion
